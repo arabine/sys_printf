@@ -44,6 +44,6 @@ typedef struct
  * @param[out] out output memory or NULL
  * @param[in] arguments of the printf
  */
-int sys_printf (sys_print_ctx_t *ctx, char **out, int *varg);
+int sys_printf (sys_print_ctx_t *ctx, char **out, const char *fmt, va_list arg);
 
 #endif /* SYS_PRINT_H_ */

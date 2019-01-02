@@ -15,7 +15,7 @@ static const uint8_t PRINT_BUF_LEN = 12U; // the following should be enough for 
 // *                               STATIC MEMBERS                               *
 // ******************************************************************************
 
-void sys_printchar (sys_print_ctx_t *ctx, char **str, int c)
+void sys_printchar (sys_print_ctx_t *ctx, char **str, char c)
 {
 	if (str)
 	{
@@ -46,7 +46,9 @@ void sys_printchar (sys_print_ctx_t *ctx, char **str, int c)
 
 static int sys_prints (sys_print_ctx_t *ctx, char **out, const char *string, int width, int pad)
 {
-	register int pc = 0, padchar = ' ';
+	int pc = 0;
+    char padchar = ' ';
+    
 	if (width > 0)
 	{
 		int len = 0;
@@ -89,12 +91,12 @@ static int sys_prints (sys_print_ctx_t *ctx, char **out, const char *string, int
 	return pc;
 }
 
-static int sys_printi (sys_print_ctx_t *ctx, char **out, int i, int b, int sg, int width, int pad, int letbase)
+static int sys_printi (sys_print_ctx_t *ctx, char **out, int32_t i, int b, int sg, int width, int pad, int letbase)
 {
 	char print_buf[PRINT_BUF_LEN];
 	char *s;
-	int t, neg = 0, pc = 0;
-	unsigned u = (unsigned) i;
+	int32_t t, neg = 0, pc = 0;
+	uint32_t u = (uint32_t) i;
 
 	if (i == 0)
 	{
@@ -105,7 +107,7 @@ static int sys_printi (sys_print_ctx_t *ctx, char **out, int i, int b, int sg, i
 	if (sg && b == 10 && i < 0)
 	{
 		neg = 1;
-		u = (unsigned) - i;
+		u = (uint32_t) - i;
 	}
 	s = print_buf + PRINT_BUF_LEN - 1;
 	*s = '\0';
@@ -135,14 +137,13 @@ static int sys_printi (sys_print_ctx_t *ctx, char **out, int i, int b, int sg, i
 	return pc + sys_prints(ctx, out, s, width, pad);
 }
 
-int sys_printf (sys_print_ctx_t *ctx, char **out, int *varg)
+int sys_printf (sys_print_ctx_t *ctx, char **out, const char *fmt, va_list varg)
 {
-	register int width, pad;
-	register int pc = 0;
-	register char *format = (char *) (*varg++);
-	register int post_decimal;
-	register unsigned dec_width = 0;
-
+	int width, pad;
+	int pc = 0;
+	const char *format = fmt;
+	int post_decimal;
+	unsigned dec_width = 0;
 	char scr[2];
 
 	for (; (*format != 0); ++format)
@@ -209,26 +210,26 @@ int sys_printf (sys_print_ctx_t *ctx, char **out, int *varg)
 			{
 				case 's':
 				{
-					char *s = *((char **) varg++);   //lint !e740
+					char *s = va_arg(varg, char *);
 					// printf("[%s] w=%u\n", s, width) ;
 					pc += sys_prints(ctx, out, s ? s : "(null)", width, pad);
 				}
 				break;
 				case 'd':
-					pc += sys_printi(ctx, out, *varg++, 10, 1, width, pad, 'a');
+					pc += sys_printi(ctx, out, va_arg(varg, int32_t), 10, 1, width, pad, 'a');
 					break;
 				case 'x':
-					pc += sys_printi(ctx, out, *varg++, 16, 0, width, pad, 'a');
+					pc += sys_printi(ctx, out, va_arg(varg, int32_t), 16, 0, width, pad, 'a');
 					break;
 				case 'X':
-					pc += sys_printi(ctx, out, *varg++, 16, 0, width, pad, 'A');
+					pc += sys_printi(ctx, out, va_arg(varg, int32_t), 16, 0, width, pad, 'A');
 					break;
 				case 'u':
-					pc += sys_printi(ctx, out, *varg++, 10, 0, width, pad, 'a');
+					pc += sys_printi(ctx, out, va_arg(varg, int32_t), 10, 0, width, pad, 'a');
 					break;
 				case 'c':
 					/* char are converted to int then pushed on the stack */
-					scr[0] = *varg++;
+					scr[0] = va_arg(varg, int32_t);
 					scr[1] = '\0';
 					pc += sys_prints(ctx, out, scr, width, pad);
 					break;

@@ -31,9 +31,11 @@ static void display_print_to_screen(const char *format, ...)
 	printCtx.len = 0;
 	printCtx.maxLen = 255;
 	
-	int *varg = (int *) (&format);
+	va_list arg;
+    va_start(arg, format);
 
-	(void)sys_printf(&printCtx, 0, varg);
+    (void)sys_printf(&printCtx, 0, format, arg);
+    va_end(arg);
 }
 
 
