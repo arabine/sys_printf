@@ -8,7 +8,14 @@ To achieve that, the library uses a specific context per physical interface. One
 
 Usage example:
 
-```
+```c
+/**
+BSD 3-Clause License
+
+Copyright (c) 2018, Anthony Rabine
+All rights reserved.
+*/
+
 #include <stdio.h>
 
 #include "sys_printf.h"
@@ -24,7 +31,8 @@ int main(void)
 
 static void custom_print(char c)
 {
-	putchar(c);  // custom putchar (uart_writechar(), lcd_write_char() ...)
+	// Replace by your custom putchar (uart_writechar(), lcd_write_char() ...)
+	putchar(c);   
 }
 
 static void display_print_to_screen(const char *format, ...)
@@ -33,10 +41,12 @@ static void display_print_to_screen(const char *format, ...)
 	
 	printCtx.pPutc = custom_print; // specific putchar for that interface
 	printCtx.len = 0; // init to zero, character counter
-	printCtx.maxLen = 255; / max length to push
+	printCtx.maxLen = 255; // max length to push
 	
-	int *varg = (int *) (&format);
+	va_list arg;
+    va_start(arg, format);
 
-	(void)sys_printf(&printCtx, 0, varg);
+    (void)sys_printf(&printCtx, 0, format, arg);
+    va_end(arg);
 }
 ```

@@ -20,16 +20,17 @@ int main(void)
 
 static void custom_print(char c)
 {
-	putchar(c); 
+	// Replace by your custom putchar (uart_writechar(), lcd_write_char() ...)
+	putchar(c);   
 }
 
 static void display_print_to_screen(const char *format, ...)
 {
-	sys_print_ctx_t printCtx;
+	sys_print_ctx_t printCtx; // our printf context
 	
-	printCtx.pPutc = custom_print;
-	printCtx.len = 0;
-	printCtx.maxLen = 255;
+	printCtx.pPutc = custom_print; // specific putchar for that interface
+	printCtx.len = 0; // init to zero, character counter
+	printCtx.maxLen = 255; // max length to push
 	
 	va_list arg;
     va_start(arg, format);
