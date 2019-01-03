@@ -46,4 +46,7 @@ typedef struct
  */
 int sys_printf (sys_print_ctx_t *ctx, char **out, const char *fmt, va_list arg);
 
+
+int sys_snprintf(char *out, uint32_t maxLen, const char *format, ...);
+
 #endif /* SYS_PRINT_H_ */

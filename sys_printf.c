@@ -244,6 +244,8 @@ int sys_printf (sys_print_ctx_t *ctx, char **out, const char *fmt, va_list varg)
 		{
 out:
 sys_printchar(ctx, out, *format);
+
+//printf("%X ", *format);
 			++pc;
 		}
 	}
@@ -253,6 +255,19 @@ sys_printchar(ctx, out, *format);
 	return pc;
 }
 
+int sys_snprintf(char *out, uint32_t maxLen, const char *format, ...)
+{
+	sys_print_ctx_t printCtx;
+	
+	printCtx.pPutc = NULL;
+	printCtx.len = 0;
+	printCtx.maxLen = maxLen;
+	
+	va_list arg;
+    va_start(arg, format);
 
+    (void)sys_printf(&printCtx, &out, format, arg);
+    va_end(arg);
+}
 
 

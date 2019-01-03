@@ -24,7 +24,14 @@ static void display_print_to_screen(const char *format, ...);
 
 int main(void)
 {
-	display_print_to_screen("Hello, %s!\r\n", "firmware");
+	display_print_to_screen("Hello, %s!\n", "firmware");
+	
+	// Also snprintf equivalent
+	char buf[255] = {0};
+	
+	sys_snprintf(&buf[0], sizeof(buf), "Tesla model 3 price is: $%d", 50000);	
+	
+	puts(buf);
 	
 	return 0;
 }
@@ -32,7 +39,11 @@ int main(void)
 static void custom_print(char c)
 {
 	// Replace by your custom putchar (uart_writechar(), lcd_write_char() ...)
-	putchar(c);   
+	
+	if (c != 0) // beware, zero is generated for string terminaison
+	{
+		putc(c, stdout); 
+	}
 }
 
 static void display_print_to_screen(const char *format, ...)
