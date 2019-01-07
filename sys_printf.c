@@ -9,7 +9,6 @@ All rights reserved.
 
 static const uint8_t PAD_RIGHT = 1U;
 static const uint8_t PAD_ZERO = 2U;
-static const uint8_t PRINT_BUF_LEN = 12U; // the following should be enough for 32 bit int
 
 // ******************************************************************************
 // *                               STATIC MEMBERS                               *
@@ -93,23 +92,22 @@ static int sys_prints (sys_print_ctx_t *ctx, char **out, const char *string, int
 
 static int sys_printi (sys_print_ctx_t *ctx, char **out, int32_t i, int b, int sg, int width, int pad, int letbase)
 {
-	char print_buf[PRINT_BUF_LEN];
 	char *s;
 	int32_t t, neg = 0, pc = 0;
 	uint32_t u = (uint32_t) i;
 
 	if (i == 0)
 	{
-		print_buf[0] = '0';
-		print_buf[1] = '\0';
-		return sys_prints(ctx, out, print_buf, width, pad);
+        ctx->print_buf[0] = '0';
+        ctx->print_buf[1] = '\0';
+        return sys_prints(ctx, out, ctx->print_buf, width, pad);
 	}
 	if (sg && b == 10 && i < 0)
 	{
 		neg = 1;
 		u = (uint32_t) - i;
 	}
-	s = print_buf + PRINT_BUF_LEN - 1;
+    s = ctx->print_buf + PRINT_BUF_LEN - 1;
 	*s = '\0';
 	while (u)
 	{
@@ -229,7 +227,7 @@ int sys_printf (sys_print_ctx_t *ctx, char **out, const char *fmt, va_list varg)
 					break;
 				case 'c':
 					/* char are converted to int then pushed on the stack */
-					scr[0] = va_arg(varg, int32_t);
+                    scr[0] = (char)va_arg(varg, int32_t);
 					scr[1] = '\0';
 					pc += sys_prints(ctx, out, scr, width, pad);
 					break;
@@ -266,8 +264,10 @@ int sys_snprintf(char *out, uint32_t maxLen, const char *format, ...)
 	va_list arg;
     va_start(arg, format);
 
-    (void)sys_printf(&printCtx, &out, format, arg);
+    int ret = sys_printf(&printCtx, &out, format, arg);
     va_end(arg);
+
+    return ret;
 }
 
 

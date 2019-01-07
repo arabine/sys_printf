@@ -12,6 +12,8 @@ All rights reserved.
 #include <stdio.h>
 #include <stdarg.h>
 
+#define PRINT_BUF_LEN 12 // the following should be enough for 32 bit int
+
 typedef void (*putc_func)(const char c);
 
 typedef struct
@@ -19,6 +21,10 @@ typedef struct
 	uint32_t maxLen;
 	uint32_t len;
 	putc_func pPutc;
+
+    // Private use, temp buffer for int to char
+    // Some compilers are not C99, so cannot declare VLA
+    char print_buf[PRINT_BUF_LEN];
 } sys_print_ctx_t;
 
 /**
